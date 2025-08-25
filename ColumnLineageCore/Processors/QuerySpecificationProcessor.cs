@@ -205,6 +205,10 @@ namespace ColumnLineageCore.Processors
                 else
                 {
                      System.Diagnostics.Debug.WriteLine($"[Processor] Warning: Unsupported TableReference type in FROM clause: {tableReference.GetType().Name}");
+                     if (context.ProcessorFactory is ProcessorFactory pf && pf.Diagnostics != null)
+                     {
+                         pf.Diagnostics.ReportMissingProcessor(tableReference.GetType());
+                     }
                 }
             }
             catch (Exception ex)

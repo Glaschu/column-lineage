@@ -6,12 +6,12 @@ This tool analyzes T-SQL scripts to determine column-level data lineage. It pars
 
 ## Core Features
 
-*   Parses T-SQL scripts into Abstract Syntax Trees (ASTs).
-*   Traverses ASTs to identify column dependencies and data flow.
-*   Builds a directed graph representing column-to-column lineage.
-*   Handles common SQL complexities like CTEs, table/column aliases, JOINs, and basic DML statements (SELECT, INSERT, UPDATE, EXECUTE).
-*   Supports resolving external view definitions (currently via `FileSystemViewDefinitionProvider` looking in a `./views` subdirectory relative to the execution path).
-*   Outputs the calculated lineage graph as a structured JSON object.
+* Parses T-SQL scripts into Abstract Syntax Trees (ASTs) and builds column-level lineage
+* Handles CTEs, aliases, joins, derived tables, INSERT/UPDATE/DELETE/MERGE/EXECUTE
+* SSDT project analysis with cross-platform compatibility (parses .sqlproj and included .sql files)
+* OpenLineage export with dataset schema, dataSource, and columnLineage facets
+* Schema export/import for richer lineage (feeds dataset schemas into OpenLineage)
+* Debugging tools for complex SQL: AST dump, missing-processor reporting, detailed logs
 
 ## Architecture
 
@@ -36,8 +36,8 @@ The core engine employs a **Processor-based design** adhering to SOLID principle
 
 ## Technology Stack
 
-*   .NET 8
-*   Microsoft.SqlServer.TransactSql.ScriptDom (Version 170.x)
+* .NET 9
+* Microsoft.SqlServer.TransactSql.ScriptDom (SQL 2019/2022 grammar)
 
 ## How it Works
 
@@ -52,24 +52,31 @@ The analysis follows these general steps:
 7.  Once the AST traversal is complete, a `LineageResult` object is created, containing the final list of nodes, edges, and any parse errors encountered.
 8.  The CLI tool serializes the `LineageResult` into JSON format and prints it to the console.
 
-## Usage
+## Quickstart
 
-1.  Navigate to the command-line interface project directory:
-    ```bash
-    cd ColumnLineageCli
-    ```
-2.  Build the solution (optional, `dotnet run` handles it):
-    ```bash
-    dotnet build ../ColumnLineageSolution.sln
-    ```
-3.  Run the tool, providing the path to the SQL file you want to analyze:
-    ```bash
-    dotnet run -- <path_to_your_sql_file.sql>
-    ```
-    For example:
-    ```bash
-    dotnet run -- ../../my_scripts/complex_query.sql
-    ```
+Single file analysis:
+
+```bash
+dotnet run --project ColumnLineageCli -- path/to/query.sql
+```
+
+Analyze an SSDT project and export OpenLineage:
+
+```bash
+dotnet run --project ColumnLineageCli -- --project path/to/MyDb.sqlproj --openlineage lineage.json
+```
+
+Import schema for richer dataset facets when analyzing a single file:
+
+```bash
+dotnet run --project ColumnLineageCli -- path/to/query.sql --import-schema schema.json --openlineage ol.json
+```
+
+Export schema from a project (to later use with --import-schema):
+
+```bash
+dotnet run --project ColumnLineageCli -- --project path/to/MyDb.sqlproj --schema schema.json
+```
 
 ## Output Format
 
@@ -110,7 +117,9 @@ The tool outputs a JSON object representing the column lineage graph. This objec
     *   `Model/`: Defines the core data structures (`ColumnNode`, `LineageEdge`).
     *   `Processors/`: Contains concrete implementations for processing different T-SQL fragments.
     *   `Helpers/`: Utility classes.
+        * `SsdtProjectProvider.cs`: Discovers and reads SQL files from SSDT (.sqlproj) with cross-platform path handling.
     *   `Json/`: Classes specifically for structuring the JSON output.
+    *   `Export/`: OpenLineage exporter and helpers.
     *   `LineageAnalyzer.cs`: Orchestrates the analysis.
     *   `LineageGraph.cs`: Manages the collection of nodes and edges.
     *   `AstProvider.cs`: Handles parsing SQL into an AST.
@@ -131,3 +140,102 @@ The `ColumnLineageCore.Tests` project contains unit and integration tests. You c
 
 ```bash
 dotnet test ColumnLineageSolution.sln
+```
+
+## OpenLineage Export
+
+Export inputs/outputs with full schema and column lineage facets:
+
+```bash
+dotnet run --project ColumnLineageCli -- --project path/to/MyDb.sqlproj \
+    --openlineage lineage.json --namespace sqlserver://my-host
+```
+
+When analyzing a single file, provide `--import-schema` to enrich input dataset schemas in the output.
+
+## Debugging Complex SQL
+
+The CLI includes switches to help diagnose parser coverage and missing processors:
+
+* `--detailed` – more verbose analysis logs
+* `--debug` – print analysis meta and sizes
+* `--debug-ast` – dumps a concise AST structure with node types and locations
+* `--debug-unhandled` – collects and prints fragment types with no registered processor
+
+Examples:
+
+```bash
+# Dump AST for a single script
+dotnet run --project ColumnLineageCli -- path/to/query.sql --debug-ast
+
+# Analyze project and list missing processors without failing
+dotnet run --project ColumnLineageCli -- --project path/to/MyDb.sqlproj --debug-unhandled
+```
+
+If `--debug-unhandled` reports a type like `Microsoft.SqlServer.TransactSql.ScriptDom.QueryParenthesisExpression`, add a processor in `ColumnLineageCore/Processors` and register it in `CreateAndRegisterProcessors` in `Program.cs`.
+
+## Schema Import/Export
+
+You can export schema from a project and later import it when analyzing single files to enrich dataset schemas in OpenLineage.
+
+Schema export format supports either:
+
+* `objects: [...]` (legacy) or
+* separate arrays: `tables`, `views`, `functions`, `storedProcedures` (preferred)
+
+When importing, table columns gain types and descriptions in the OpenLineage `schema` facet.
+
+## Processor coverage and known gaps
+
+Implemented processors (as of this repo):
+
+- Statements: InsertStatementProcessor, UpdateStatementProcessor, DeleteStatementProcessor, MergeStatementProcessor, ExecuteStatementProcessor
+- Query expressions: QuerySpecificationProcessor, BinaryQueryExpressionProcessor (UNION/INTERSECT/EXCEPT)
+- Table references: NamedTableReferenceProcessor, JoinTableReferenceProcessor, QueryDerivedTableProcessor, PivotedTableReferenceProcessor, UnpivotedTableReferenceProcessor, VariableTableReferenceProcessor
+- Select elements: SelectScalarExpressionProcessor, SelectStarExpressionProcessor
+- CTE handling: CteScopeProcessor (WITH ...)
+
+High‑priority missing processors or areas for full end‑to‑end lineage:
+
+- Query expressions
+  - QueryParenthesisExpression (unwrap nested/parenthesized queries)
+
+- Table references (FROM)
+  - SchemaObjectFunctionTableReference (table‑valued functions)
+  - ApplyTableReference (CROSS APPLY / OUTER APPLY)
+  - OpenJsonTableReference (OPENJSON)
+  - OpenRowset / OpenQuery / OpenDataSourceTableReference
+
+- Select elements
+  - SelectSetVariable (e.g., SELECT @v = col ...)
+
+- Scalar/expressions inside SelectScalarExpression (partial today)
+  - FunctionCall (built‑ins, aggregates), OverClause (window functions)
+  - CaseExpression (Simple/Searched)
+  - CastSpecification / Convert / Try_Convert / Try_Cast
+  - BinaryExpression / BooleanBinaryExpression, UnaryExpression
+  - ScalarSubquery
+
+- Clauses and semantics
+  - GROUP BY / HAVING (aggregate lineage to base columns)
+  - DISTINCT (no new lineage but ensure consistent edge semantics)
+
+- DML details
+  - OUTPUT clauses for INSERT/UPDATE/DELETE/MERGE
+  - MERGE output and per‑branch mappings
+
+- Objects and sources
+  - Table‑valued parameters and table variables (@tv)
+  - Temporary tables (#temp) — infer/import schemas and propagate
+  - Synonyms resolution to underlying objects
+  - External tables — treat as named sources with imported schema
+
+How to extend:
+
+1) Implement a processor under `ColumnLineageCore/Processors` for the ScriptDom type you’re handling.
+2) Register it in `CreateAndRegisterProcessors` in `ColumnLineageCli/Program.cs`.
+3) Use `--debug-unhandled` to discover additional missing fragment types in your workload.
+
+## SSDT Notes
+
+`SsdtProjectProvider` normalizes Windows `\` and macOS/Linux `/` separators and respects `<Build Include=...>` entries. Ensure your `.sqlproj` includes files you want analyzed.

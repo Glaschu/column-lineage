@@ -54,6 +54,12 @@ namespace ColumnLineageCore
 
         // --- GetProcessor Implementation ---
 
+        // Optional diagnostics to capture missing processor registrations at runtime.
+        public ColumnLineageCore.Diagnostics.ProcessorDiagnostics? Diagnostics { get; set; }
+
+        // When true, do not throw on missing processors; instead, report via Diagnostics and return a no-op processor.
+        public bool LenientMissingProcessors { get; set; } = false;
+
         /// <summary>
         /// Gets the processor suitable for handling the specified TSqlFragment type.
         /// </summary>
@@ -62,8 +68,13 @@ namespace ColumnLineageCore
         {
             if (!_processorRegistry.TryGetValue(typeof(TFragment), out var factoryFunc))
             {
+                if (LenientMissingProcessors)
+                {
+                    Diagnostics?.ReportMissingProcessor(typeof(TFragment));
+                    // Return a no-op processor to continue analysis
+                    return new NoOpProcessor<TFragment>();
+                }
                 // Optional: Could check base types if direct type not found
-                // For now, throw if exact type match isn't registered.
                 throw new NotSupportedException($"No processor registered for fragment type: {typeof(TFragment).FullName}");
             }
 
@@ -79,6 +90,17 @@ namespace ColumnLineageCore
                 // This should ideally not happen if registration is correct, but good to check.
                 throw new InvalidOperationException($"Registered factory for {typeof(TFragment).FullName} returned an incompatible processor type: {processorObject?.GetType().FullName}");
             }
+        }
+    }
+
+    /// <summary>
+    /// A no-op processor used when lenient mode is enabled; it safely ignores unsupported fragments.
+    /// </summary>
+    internal sealed class NoOpProcessor<TFragment> : ISqlFragmentProcessor<TFragment> where TFragment : TSqlFragment
+    {
+        public void Process(TFragment fragment, IProcessingContext context)
+        {
+            // Intentionally no-op; diagnostics are collected in ProcessorFactory.
         }
     }
 }

@@ -94,7 +94,7 @@ namespace ColumnLineageCli
                     }
                 }
 
-                AnalyzeSsdtProject(projectPath, openLineageFile, schemaFile, importSchemaFile, namespaceValue, detailed);
+                    AnalyzeSsdtProject(projectPath, openLineageFile, schemaFile, importSchemaFile, namespaceValue, detailed, debug, debugAst, debugUnhandled);
                 return;
             }
 
@@ -208,6 +208,13 @@ namespace ColumnLineageCli
 
                 // --- Instantiate the Analyzer ---
                 // The analyzer orchestrates the process using the dependencies
+                // Enable diagnostics if requested
+                if (debugUnhandled && processorFactory is ProcessorFactory pf)
+                {
+                    pf.LenientMissingProcessors = true;
+                    pf.Diagnostics = new ColumnLineageCore.Diagnostics.ProcessorDiagnostics();
+                }
+
                 var analyzer = new LineageAnalyzer(astProvider, processorFactory, cteScopeProcessor, viewProvider); // Added viewProvider
 
                 // --- Debug Mode: Show AST structure if requested ---
@@ -259,6 +266,19 @@ namespace ColumnLineageCli
                 string jsonOutput = lineageResult.ToJson(indented: true);
                 Console.WriteLine("\n--- Lineage Result (JSON) ---");
                 Console.WriteLine(jsonOutput);
+
+                // Report unhandled fragment types if diagnostics enabled
+                if (debugUnhandled && processorFactory is ProcessorFactory pf2 && pf2.Diagnostics != null && pf2.Diagnostics.MissingProcessorTypes.Count > 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\n=== Missing Processor Registrations ===");
+                    Console.ResetColor();
+                    foreach (var typeName in pf2.Diagnostics.MissingProcessorTypes)
+                    {
+                        Console.WriteLine($"- {typeName}");
+                    }
+                    Console.WriteLine("Tip: Register a processor via CreateAndRegisterProcessors or implement a processor in ColumnLineageCore.Processors.");
+                }
 
                 // --- Export to OpenLineage format if requested ---
                 if (!string.IsNullOrEmpty(openLineageFile))
@@ -391,7 +411,64 @@ namespace ColumnLineageCli
             }
         }
 
-        static void AnalyzeSsdtProject(string projectPath, string? openLineageFile = null, string? schemaFile = null, string? importSchemaFile = null, string? namespaceValue = null, bool detailed = false)
+        // Dumps a concise AST structure for debugging parser coverage
+        static void ShowAstStructure(string sqlScript, IAstProvider astProvider)
+        {
+            var fragment = astProvider.Parse(sqlScript, out var errors);
+            if (errors.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"Parser reported {errors.Count} error(s):");
+                Console.ResetColor();
+                foreach (var e in errors)
+                {
+                    Console.WriteLine($"- Line {e.Line}, Col {e.Column}: {e.Message}");
+                }
+            }
+
+            if (fragment == null)
+            {
+                Console.WriteLine("No AST produced.");
+                return;
+            }
+
+            void DumpNode(TSqlFragment node, int depth)
+            {
+                var indent = new string(' ', Math.Min(depth, 6) * 2);
+                Console.WriteLine($"{indent}- {node.GetType().Name} [{node.StartLine}:{node.StartColumn} - {node.FragmentLength}]");
+                foreach (var child in node.ScriptTokenStream == null ? EnumerateChildren(node) : EnumerateChildren(node))
+                {
+                    if (child is TSqlFragment f)
+                        DumpNode(f, depth + 1);
+                }
+            }
+
+            // Use reflection-based child enumeration as ScriptDom doesn't expose visitors for all types easily here
+            IEnumerable<object?> EnumerateChildren(object obj)
+            {
+                foreach (var prop in obj.GetType().GetProperties())
+                {
+                    var val = prop.GetValue(obj);
+                    if (val is TSqlFragment)
+                        yield return val;
+                    else if (val is System.Collections.IEnumerable enumerable && val is not string)
+                    {
+                        foreach (var item in enumerable)
+                        {
+                            if (item is TSqlFragment)
+                                yield return item;
+                        }
+                    }
+                }
+            }
+
+            if (fragment is TSqlFragment root)
+            {
+                DumpNode(root, 0);
+            }
+        }
+
+    static void AnalyzeSsdtProject(string projectPath, string? openLineageFile = null, string? schemaFile = null, string? importSchemaFile = null, string? namespaceValue = null, bool detailed = false, bool debug = false, bool debugAst = false, bool debugUnhandled = false)
         {
             try
             {
@@ -431,6 +508,16 @@ namespace ColumnLineageCli
                 else
                 {
                     projectProvider = new SsdtProjectProvider();
+                }
+
+                // Enable diagnostics if requested
+                if (detailed == true) { /* keep verbose */ }
+                // Try to detect debug flags by scanning args again (simple approach within this method scope)
+                    bool debugUnhandledProject = debugUnhandled; // Use the passed parameter
+                if (debugUnhandledProject && processorFactory is ProcessorFactory pfProject)
+                {
+                    pfProject.LenientMissingProcessors = true;
+                    pfProject.Diagnostics = new ColumnLineageCore.Diagnostics.ProcessorDiagnostics();
                 }
 
                 // --- Instantiate the Project Analyzer ---
@@ -475,6 +562,20 @@ namespace ColumnLineageCli
                 string jsonOutput = projectResult.CombinedLineage.ToJson(indented: true);
                 Console.WriteLine("\n--- Combined Project Lineage (JSON) ---");
                 Console.WriteLine(jsonOutput);
+
+                // Report missing processor types if diagnostics enabled
+                if (debugUnhandled && processorFactory is ProcessorFactory pfDiag && pfDiag.Diagnostics != null && pfDiag.Diagnostics.MissingProcessorTypes.Count > 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\n=== Missing Processor Registrations ===");
+                    Console.ResetColor();
+                    foreach (var t in pfDiag.Diagnostics.MissingProcessorTypes)
+                    {
+                        Console.WriteLine($"- {t}");
+                    }
+                }
+
+                // (Diagnostics already printed above when debugUnhandled is true)
 
                 // Export to OpenLineage if requested
                 if (!string.IsNullOrEmpty(openLineageFile))
