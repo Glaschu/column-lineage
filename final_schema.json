@@ -1,0 +1,191 @@
+{
+  "exportedAt": "2025-08-25T19:58:07Z",
+  "version": "1.0",
+  "objects": [
+    {
+      "name": "Categories",
+      "schema": "dbo",
+      "fullName": "[dbo].[Categories]",
+      "type": "table",
+      "filePath": "simple-test-project/Categories.sql",
+      "columns": [
+        {
+          "name": "CategoryID",
+          "dataType": "Int",
+          "description": ""
+        },
+        {
+          "name": "CategoryName",
+          "dataType": "NVarChar(100)",
+          "description": ""
+        },
+        {
+          "name": "Description",
+          "dataType": "NVarChar(500)",
+          "description": ""
+        }
+      ],
+      "dependencies": [
+        "dbo",
+        "dbo.Categories"
+      ],
+      "metadata": {
+        "filePath": "simple-test-project/Categories.sql",
+        "fileSize": 173,
+        "lastModified": "2025-08-25T20:57:10.653232+01:00"
+      },
+      "datasetNamespace": "sqlserver://localhost"
+    },
+    {
+      "name": "Products",
+      "schema": "dbo",
+      "fullName": "[dbo].[Products]",
+      "type": "table",
+      "filePath": "simple-test-project/Products.sql",
+      "columns": [
+        {
+          "name": "ProductID",
+          "dataType": "Int",
+          "description": ""
+        },
+        {
+          "name": "ProductName",
+          "dataType": "NVarChar(100)",
+          "description": ""
+        },
+        {
+          "name": "CategoryID",
+          "dataType": "Int",
+          "description": ""
+        },
+        {
+          "name": "Price",
+          "dataType": "Decimal(18, 2)",
+          "description": ""
+        },
+        {
+          "name": "CreateDate",
+          "dataType": "DateTime2",
+          "description": ""
+        }
+      ],
+      "dependencies": [
+        "GETDATE",
+        "dbo",
+        "dbo.Products"
+      ],
+      "metadata": {
+        "filePath": "simple-test-project/Products.sql",
+        "fileSize": 240,
+        "lastModified": "2025-08-25T20:53:13.4842151+01:00",
+        "imported_filePath": "simple-test-project/Products.sql",
+        "imported_fileSize": "240",
+        "imported_lastModified": "2025-08-25T20:53:13.4842151\u002B01:00",
+        "enhanced_with_imported_schema": true
+      },
+      "datasetNamespace": "sqlserver://localhost"
+    },
+    {
+      "name": "ProductCategorySummary",
+      "schema": "dbo",
+      "fullName": "[dbo].[ProductCategorySummary]",
+      "type": "view",
+      "filePath": "simple-test-project/ProductCategorySummary.sql",
+      "columns": [
+        {
+          "name": "ProductID",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "ProductName",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "Price",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "CategoryName",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "CategoryDescription",
+          "dataType": "unknown",
+          "description": ""
+        }
+      ],
+      "dependencies": [
+        "dbo.Products",
+        "dbo.Categories",
+        "DATEADD",
+        "GETDATE",
+        "dbo"
+      ],
+      "metadata": {
+        "filePath": "simple-test-project/ProductCategorySummary.sql",
+        "fileSize": 302,
+        "lastModified": "2025-08-25T20:57:17.443024+01:00"
+      },
+      "datasetNamespace": "sqlserver://localhost"
+    },
+    {
+      "name": "ProductSummary",
+      "schema": "dbo",
+      "fullName": "[dbo].[ProductSummary]",
+      "type": "view",
+      "filePath": "simple-test-project/ProductSummary.sql",
+      "columns": [
+        {
+          "name": "ProductID",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "ProductName",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "Price",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "PriceCategory",
+          "dataType": "unknown",
+          "description": ""
+        }
+      ],
+      "dependencies": [
+        "dbo.Products",
+        "DATEADD",
+        "GETDATE",
+        "dbo"
+      ],
+      "metadata": {
+        "filePath": "simple-test-project/ProductSummary.sql",
+        "fileSize": 299,
+        "lastModified": "2025-08-25T20:53:21.4993419+01:00",
+        "imported_filePath": "simple-test-project/ProductSummary.sql",
+        "imported_fileSize": "299",
+        "imported_lastModified": "2025-08-25T20:53:21.4993419\u002B01:00",
+        "enhanced_with_imported_schema": true
+      },
+      "datasetNamespace": "sqlserver://localhost"
+    }
+  ],
+  "summary": {
+    "totalObjects": 4,
+    "tables": 2,
+    "views": 2,
+    "storedProcedures": 0,
+    "functions": 0,
+    "schemasIncluded": [
+      "dbo"
+    ]
+  }
+}

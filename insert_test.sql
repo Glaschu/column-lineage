@@ -1,0 +1,1 @@
+INSERT INTO EmployeeBackup (BusinessEntityID, JobTitle, FirstName, LastName) SELECT e.BusinessEntityID, e.JobTitle, p.FirstName, p.LastName FROM Employee e INNER JOIN Person p ON e.BusinessEntityID = p.BusinessEntityID WHERE e.HireDate < "2020-01-01";

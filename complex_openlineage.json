@@ -1,0 +1,478 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2025-08-25T20:14:29.240868Z",
+  "run": {
+    "runId": "c03199b8-769a-43f0-915a-351592e05254",
+    "facets": {
+      "nominalTime": {
+        "nominalStartTime": "2025-08-25T20:14:29Z"
+      }
+    }
+  },
+  "job": {
+    "namespace": "sqlserver://localhost",
+    "name": "complex_test",
+    "facets": {
+      "documentation": {
+        "description": "SSDT Project: complex_test"
+      },
+      "sourceCode": {
+        "language": "sql",
+        "source": "SSDT Project Analysis"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[Orders]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "OrderID",
+              "type": "INTEGER",
+              "description": "Column from Orders"
+            },
+            {
+              "name": "OrderDate",
+              "type": "TIMESTAMP",
+              "description": "Column from Orders"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "Orders"
+        },
+        "documentation": {
+          "description": "Table: [dbo].[Orders]"
+        }
+      }
+    },
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[Customers]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "CustomerName",
+              "type": "VARCHAR(255)",
+              "description": "Column from Customers"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "Customers"
+        },
+        "documentation": {
+          "description": "Table: [dbo].[Customers]"
+        }
+      }
+    },
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[Products]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "ProductName",
+              "type": "VARCHAR(255)",
+              "description": "Column from Products"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "Products"
+        },
+        "documentation": {
+          "description": "Table: [dbo].[Products]"
+        }
+      }
+    },
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[OrderDetails]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "Quantity",
+              "type": "VARCHAR(255)",
+              "description": "Column from OrderDetails"
+            },
+            {
+              "name": "UnitPrice",
+              "type": "DECIMAL(10,2)",
+              "description": "Column from OrderDetails"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "OrderDetails"
+        },
+        "documentation": {
+          "description": "Table: [dbo].[OrderDetails]"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[complex_test]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "OrderID",
+              "type": "INTEGER",
+              "description": "Output column from complex_test"
+            },
+            {
+              "name": "OrderDate",
+              "type": "TIMESTAMP",
+              "description": "Output column from complex_test"
+            },
+            {
+              "name": "CustomerName",
+              "type": "VARCHAR(255)",
+              "description": "Output column from complex_test"
+            },
+            {
+              "name": "ProductName",
+              "type": "VARCHAR(255)",
+              "description": "Output column from complex_test"
+            },
+            {
+              "name": "Quantity",
+              "type": "VARCHAR(255)",
+              "description": "Output column from complex_test"
+            },
+            {
+              "name": "UnitPrice",
+              "type": "DECIMAL(10,2)",
+              "description": "Output column from complex_test"
+            },
+            {
+              "name": "TotalAmount",
+              "type": "DECIMAL(10,2)",
+              "description": "Output column from complex_test"
+            },
+            {
+              "name": "OrderPeriod",
+              "type": "VARCHAR(255)",
+              "description": "Output column from complex_test"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "complex_test"
+        },
+        "columnLineage": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-2-0/ColumnLineageDatasetFacet.json",
+          "fields": {
+            "OrderID": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Orders",
+                  "field": "OrderID",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "OrderDate": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Orders",
+                  "field": "OrderDate",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "CustomerName": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Customers",
+                  "field": "CustomerName",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "ProductName": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Products",
+                  "field": "ProductName",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "Quantity": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "OrderDetails",
+                  "field": "Quantity",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "UnitPrice": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "OrderDetails",
+                  "field": "UnitPrice",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "TotalAmount": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "OrderDetails",
+                  "field": "Quantity",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "TRANSFORMATION",
+                      "description": "Column transformation",
+                      "masking": false
+                    }
+                  ]
+                },
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "OrderDetails",
+                  "field": "UnitPrice",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "TRANSFORMATION",
+                      "description": "Column transformation",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "OrderPeriod": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Orders",
+                  "field": "OrderDate",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "TRANSFORMATION",
+                      "description": "Column transformation",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "dataset": [
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Orders",
+              "field": "OrderID",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Orders",
+              "field": "OrderDate",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Customers",
+              "field": "CustomerName",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Products",
+              "field": "ProductName",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "OrderDetails",
+              "field": "Quantity",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "OrderDetails",
+              "field": "UnitPrice",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "OrderDetails",
+              "field": "Quantity",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "TRANSFORMATION",
+                  "description": "Column transformation",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "OrderDetails",
+              "field": "UnitPrice",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "TRANSFORMATION",
+                  "description": "Column transformation",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Orders",
+              "field": "OrderDate",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "TRANSFORMATION",
+                  "description": "Column transformation",
+                  "masking": false
+                }
+              ]
+            }
+          ]
+        },
+        "documentation": {
+          "description": "View: [dbo].[complex_test]"
+        }
+      }
+    }
+  ]
+}

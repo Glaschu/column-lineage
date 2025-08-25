@@ -189,6 +189,18 @@ namespace ColumnLineageCore.Processors
                 {
                      context.ProcessorFactory.GetProcessor(joinRef).Process(joinRef, context);
                 }
+                else if (tableReference is PivotedTableReference pivotRef)
+                {
+                     context.ProcessorFactory.GetProcessor(pivotRef).Process(pivotRef, context);
+                }
+                else if (tableReference is UnpivotedTableReference unpivotRef)
+                {
+                     context.ProcessorFactory.GetProcessor(unpivotRef).Process(unpivotRef, context);
+                }
+                else if (tableReference is VariableTableReference varRef)
+                {
+                     context.ProcessorFactory.GetProcessor(varRef).Process(varRef, context);
+                }
                 // Add other TableReference types here if needed
                 else
                 {

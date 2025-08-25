@@ -1,0 +1,50 @@
+{
+  "tables": [
+    {
+      "name": "Products",
+      "schema": "dbo",
+      "columns": [
+        {
+          "name": "ProductID",
+          "dataType": "INT",
+          "description": "Primary key for products"
+        },
+        {
+          "name": "ProductName",
+          "dataType": "NVARCHAR(100)",
+          "description": "Name of the product"
+        },
+        {
+          "name": "Price",
+          "dataType": "DECIMAL(10,2)",
+          "description": "Product price"
+        },
+        {
+          "name": "CategoryID",
+          "dataType": "INT",
+          "description": "Foreign key to Categories table"
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "schema": "dbo",
+      "columns": [
+        {
+          "name": "CategoryID",
+          "dataType": "INT",
+          "description": "Primary key for categories"
+        },
+        {
+          "name": "CategoryName",
+          "dataType": "NVARCHAR(50)",
+          "description": "Name of the category"
+        }
+      ]
+    }
+  ],
+  "views": [],
+  "functions": [],
+  "storedProcedures": [],
+  "exportDate": "2025-08-25T20:00:00.000Z"
+}

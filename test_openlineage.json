@@ -1,0 +1,295 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2025-08-25T20:14:01.817321Z",
+  "run": {
+    "runId": "9e41d71f-d9e0-4866-887e-ca43281af41e",
+    "facets": {
+      "nominalTime": {
+        "nominalStartTime": "2025-08-25T20:14:01Z"
+      }
+    }
+  },
+  "job": {
+    "namespace": "sqlserver://localhost",
+    "name": "test_query",
+    "facets": {
+      "documentation": {
+        "description": "SSDT Project: test_query"
+      },
+      "sourceCode": {
+        "language": "sql",
+        "source": "SSDT Project Analysis"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[Products]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "ProductID",
+              "type": "INTEGER",
+              "description": "Column from Products"
+            },
+            {
+              "name": "ProductName",
+              "type": "VARCHAR(255)",
+              "description": "Column from Products"
+            },
+            {
+              "name": "Price",
+              "type": "DECIMAL(10,2)",
+              "description": "Column from Products"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "Products"
+        },
+        "documentation": {
+          "description": "Table: [dbo].[Products]"
+        }
+      }
+    },
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[Categories]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "CategoryName",
+              "type": "VARCHAR(255)",
+              "description": "Column from Categories"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "Categories"
+        },
+        "documentation": {
+          "description": "Table: [dbo].[Categories]"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[test_query]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "ProductID",
+              "type": "INTEGER",
+              "description": "Output column from test_query"
+            },
+            {
+              "name": "ProductName",
+              "type": "VARCHAR(255)",
+              "description": "Output column from test_query"
+            },
+            {
+              "name": "Price",
+              "type": "DECIMAL(10,2)",
+              "description": "Output column from test_query"
+            },
+            {
+              "name": "PriceCategory",
+              "type": "DECIMAL(10,2)",
+              "description": "Output column from test_query"
+            },
+            {
+              "name": "CategoryName",
+              "type": "VARCHAR(255)",
+              "description": "Output column from test_query"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "test_query"
+        },
+        "columnLineage": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-2-0/ColumnLineageDatasetFacet.json",
+          "fields": {
+            "ProductID": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Products",
+                  "field": "ProductID",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "ProductName": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Products",
+                  "field": "ProductName",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "Price": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Products",
+                  "field": "Price",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "PriceCategory": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Products",
+                  "field": "Price",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "TRANSFORMATION",
+                      "description": "CASE expression transformation",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "CategoryName": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Categories",
+                  "field": "CategoryName",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "dataset": [
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Products",
+              "field": "ProductID",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Products",
+              "field": "ProductName",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Products",
+              "field": "Price",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Products",
+              "field": "Price",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "TRANSFORMATION",
+                  "description": "CASE expression transformation",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Categories",
+              "field": "CategoryName",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            }
+          ]
+        },
+        "documentation": {
+          "description": "View: [dbo].[test_query]"
+        }
+      }
+    }
+  ]
+}

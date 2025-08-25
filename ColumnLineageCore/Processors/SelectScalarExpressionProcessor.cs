@@ -119,16 +119,157 @@ namespace ColumnLineageCore.Processors
                       }
                  }
             }
-            // TODO: Add handlers for SimpleCaseExpression, CastCall etc.
+            else if (selectScalar.Expression is SimpleCaseExpression simpleCaseExpr)
+            {
+                ultimateSourceNode = null; // Simple CASE expression source is untraceable for now
+                System.Diagnostics.Debug.WriteLine($"[Processor] Analyzing SimpleCaseExpression...");
+                var columnFinder = new ColumnReferenceFinder();
+                
+                // Visit the input expression (the expression being evaluated)
+                simpleCaseExpr.InputExpression?.Accept(columnFinder);
+                
+                // Visit WHEN values and THEN results
+                foreach(var whenClause in simpleCaseExpr.WhenClauses)
+                {
+                     whenClause.WhenExpression?.Accept(columnFinder);
+                     whenClause.ThenExpression?.Accept(columnFinder);
+                }
+                // Visit ELSE result
+                simpleCaseExpr.ElseExpression?.Accept(columnFinder);
+
+                // Resolve sources for all found column references
+                foreach(var foundColRef in columnFinder.ColumnReferences)
+                {
+                     ResolveColumnReferenceSource(foundColRef, context, outputName + "_simpleCaseInput", out _, out var directSource);
+                     if (directSource != null && !directSourceNodes.Contains(directSource))
+                     {
+                          directSourceNodes.Add(directSource);
+                          System.Diagnostics.Debug.WriteLine($"[Processor] Added simple CASE expression input source: {directSource.Id}");
+                     }
+                }
+            }
+            else if (selectScalar.Expression is CastCall castExpr)
+            {
+                ultimateSourceNode = null; // CAST expression preserves source but changes type
+                System.Diagnostics.Debug.WriteLine($"[Processor] Analyzing CastCall expression...");
+                var columnFinder = new ColumnReferenceFinder();
+                
+                // Visit the parameter being cast
+                castExpr.Parameter?.Accept(columnFinder);
+
+                // Resolve sources for all found column references
+                foreach(var foundColRef in columnFinder.ColumnReferences)
+                {
+                     ResolveColumnReferenceSource(foundColRef, context, outputName + "_castInput", out _, out var directSource);
+                     if (directSource != null && !directSourceNodes.Contains(directSource))
+                     {
+                          directSourceNodes.Add(directSource);
+                          System.Diagnostics.Debug.WriteLine($"[Processor] Added CAST expression input source: {directSource.Id}");
+                     }
+                }
+            }
+            else if (selectScalar.Expression is ConvertCall convertExpr)
+            {
+                ultimateSourceNode = null; // CONVERT expression preserves source but changes type
+                System.Diagnostics.Debug.WriteLine($"[Processor] Analyzing ConvertCall expression...");
+                var columnFinder = new ColumnReferenceFinder();
+                
+                // Visit the parameter being converted (ConvertCall typically has Parameter property)
+                convertExpr.Parameter?.Accept(columnFinder);
+
+                // Resolve sources for all found column references
+                foreach(var foundColRef in columnFinder.ColumnReferences)
+                {
+                     ResolveColumnReferenceSource(foundColRef, context, outputName + "_convertInput", out _, out var directSource);
+                     if (directSource != null && !directSourceNodes.Contains(directSource))
+                     {
+                          directSourceNodes.Add(directSource);
+                          System.Diagnostics.Debug.WriteLine($"[Processor] Added CONVERT expression input source: {directSource.Id}");
+                     }
+                }
+            }
+            else if (selectScalar.Expression is FunctionCall functionCall)
+            {
+                ultimateSourceNode = null; // Function calls typically transform input columns
+                System.Diagnostics.Debug.WriteLine($"[Processor] Analyzing FunctionCall: {functionCall.FunctionName?.Value ?? "Unknown"}");
+                var columnFinder = new ColumnReferenceFinder();
+                
+                // Visit all function parameters
+                foreach(var param in functionCall.Parameters)
+                {
+                     param?.Accept(columnFinder);
+                }
+
+                // Resolve sources for all found column references
+                foreach(var foundColRef in columnFinder.ColumnReferences)
+                {
+                     ResolveColumnReferenceSource(foundColRef, context, outputName + "_funcInput", out _, out var directSource);
+                     if (directSource != null && !directSourceNodes.Contains(directSource))
+                     {
+                          directSourceNodes.Add(directSource);
+                          System.Diagnostics.Debug.WriteLine($"[Processor] Added function call input source: {directSource.Id}");
+                     }
+                }
+            }
+            else if (selectScalar.Expression is ParenthesisExpression parenExpr)
+            {
+                // Handle expressions wrapped in parentheses
+                System.Diagnostics.Debug.WriteLine($"[Processor] Processing ParenthesisExpression...");
+                if (parenExpr.Expression is ColumnReferenceExpression nestedColRef)
+                {
+                    ResolveColumnReferenceSource(nestedColRef, context, outputName, out ultimateSourceNode, out var directSource);
+                    if (directSource != null && !directSourceNodes.Contains(directSource))
+                    {
+                        directSourceNodes.Add(directSource);
+                    }
+                }
+                else
+                {
+                    ultimateSourceNode = null;
+                    var columnFinder = new ColumnReferenceFinder();
+                    parenExpr.Expression?.Accept(columnFinder);
+                    foreach(var foundColRef in columnFinder.ColumnReferences)
+                    {
+                        ResolveColumnReferenceSource(foundColRef, context, outputName + "_parenInput", out _, out var directSource);
+                        if (directSource != null && !directSourceNodes.Contains(directSource))
+                        {
+                            directSourceNodes.Add(directSource);
+                            System.Diagnostics.Debug.WriteLine($"[Processor] Added parenthesis expression input source: {directSource.Id}");
+                        }
+                    }
+                }
+            }
+            // TODO: Add handlers for other complex expressions as needed
             else
             {
                  System.Diagnostics.Debug.WriteLine($"[Processor] Warning: Unhandled expression type in SelectScalarExpression: {selectScalar.Expression.GetType().Name}");
                  ultimateSourceNode = null;
+                 
+                 // Try to find any column references in unhandled expressions
+                 var columnFinder = new ColumnReferenceFinder();
+                 selectScalar.Expression?.Accept(columnFinder);
+                 foreach(var foundColRef in columnFinder.ColumnReferences)
+                 {
+                     ResolveColumnReferenceSource(foundColRef, context, outputName + "_unknownInput", out _, out var directSource);
+                     if (directSource != null && !directSourceNodes.Contains(directSource))
+                     {
+                         directSourceNodes.Add(directSource);
+                         System.Diagnostics.Debug.WriteLine($"[Processor] Added unknown expression input source: {directSource.Id}");
+                     }
+                 }
             }
 
             // --- Add Nodes and Edges ---
             bool resolutionAttempted = selectScalar.Expression is ColumnReferenceExpression;
             bool resolutionSucceeded = ultimateSourceNode != null || directSourceNodes.Any();
+
+            // For complex expressions with a single source, promote the direct source to ultimate source
+            if (ultimateSourceNode == null && directSourceNodes.Count == 1)
+            {
+                ultimateSourceNode = directSourceNodes[0];
+                directSourceNodes.Clear(); // Clear since we're promoting it to ultimate
+                System.Diagnostics.Debug.WriteLine($"[Processor] Promoted single direct source to ultimate source for '{outputName}': {ultimateSourceNode.Id}");
+            }
 
             // Call AddGraphElements UNLESS it was a ColumnReference AND resolution failed.
             // This ensures target nodes are created for literals, functions, etc.
@@ -343,9 +484,10 @@ namespace ColumnLineageCore.Processors
                      System.Diagnostics.Debug.WriteLine($"[Processor] Added edge from direct source '{directSource.Id}' to target '{targetNode.Id}'.");
                  }
              }
-             else if (ultimateSourceNode != null && !directSourceNodes.Contains(ultimateSourceNode))
+             else if (ultimateSourceNode != null)
              {
-                 System.Diagnostics.Debug.WriteLine($"[Processor] No direct sources identified for output '{outputName}', no edge added directly from ultimate source '{(ultimateSourceNode?.Id ?? "null")}'.");
+                 context.Graph.AddEdge(ultimateSourceNode, targetNode);
+                 System.Diagnostics.Debug.WriteLine($"[Processor] Added edge from ultimate source '{ultimateSourceNode.Id}' to target '{targetNode.Id}'.");
              }
              else
              {

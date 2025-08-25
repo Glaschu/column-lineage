@@ -174,11 +174,19 @@ namespace ColumnLineageCore
                  {
                       _processorFactory.GetProcessor(updateStatement).Process(updateStatement, context);
                  }
+                 else if (statement is MergeStatement mergeStatement)
+                 {
+                      _processorFactory.GetProcessor(mergeStatement).Process(mergeStatement, context);
+                 }
                  else if (statement is ExecuteStatement executeStatement) // Added handling for EXECUTE
                  {
                       _processorFactory.GetProcessor(executeStatement).Process(executeStatement, context);
                  }
-                 // TODO: Add handling for DELETE, MERGE
+                 else if (statement is DeleteStatement deleteStatement) // Added handling for DELETE
+                 {
+                      _processorFactory.GetProcessor(deleteStatement).Process(deleteStatement, context);
+                 }
+                 // TODO: Add handling for other statement types as needed
                  // ... other statement types ...
                  else
                  {

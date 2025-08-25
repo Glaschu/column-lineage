@@ -1,0 +1,179 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2025-08-25T19:58:07.063125Z",
+  "run": {
+    "runId": "2ac1cc4f-8740-4f58-afb7-d17bd3e73f56",
+    "facets": {
+      "nominalTime": {
+        "nominalStartTime": "2025-08-25T19:58:07Z"
+      }
+    }
+  },
+  "job": {
+    "namespace": "sqlserver://localhost",
+    "name": "simple-test-project",
+    "facets": {
+      "documentation": {
+        "description": "SSDT Project: simple-test-project"
+      },
+      "sourceCode": {
+        "language": "sql",
+        "source": "SSDT Project Analysis"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[Products]",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "ProductID",
+              "type": "Int",
+              "description": ""
+            },
+            {
+              "name": "ProductName",
+              "type": "NVarChar(100)",
+              "description": ""
+            },
+            {
+              "name": "CategoryID",
+              "type": "Int",
+              "description": ""
+            },
+            {
+              "name": "Price",
+              "type": "Decimal(18, 2)",
+              "description": ""
+            },
+            {
+              "name": "CreateDate",
+              "type": "DateTime2",
+              "description": ""
+            }
+          ]
+        },
+        "documentation": {
+          "description": "Table: [dbo].[Products]",
+          "filePath": "simple-test-project/Products.sql"
+        },
+        "dataSource": {
+          "name": "SSDT Project",
+          "uri": "simple-test-project/Products.sql"
+        },
+        "dependencies": [
+          "GETDATE",
+          "dbo",
+          "dbo.Products"
+        ]
+      }
+    },
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[Categories]",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "CategoryID",
+              "type": "Int",
+              "description": ""
+            },
+            {
+              "name": "CategoryName",
+              "type": "NVarChar(100)",
+              "description": ""
+            },
+            {
+              "name": "Description",
+              "type": "NVarChar(500)",
+              "description": ""
+            }
+          ]
+        },
+        "documentation": {
+          "description": "Table: [dbo].[Categories]",
+          "filePath": "simple-test-project/Categories.sql"
+        },
+        "dataSource": {
+          "name": "SSDT Project",
+          "uri": "simple-test-project/Categories.sql"
+        },
+        "dependencies": [
+          "dbo",
+          "dbo.Categories"
+        ]
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[ProductSummary]",
+      "facets": {
+        "schema": {
+          "fields": [
+            {
+              "name": "ProductID",
+              "type": "unknown",
+              "description": ""
+            },
+            {
+              "name": "ProductName",
+              "type": "unknown",
+              "description": ""
+            },
+            {
+              "name": "Price",
+              "type": "unknown",
+              "description": ""
+            },
+            {
+              "name": "PriceCategory",
+              "type": "unknown",
+              "description": ""
+            }
+          ]
+        },
+        "documentation": {
+          "description": "View: [dbo].[ProductSummary]",
+          "filePath": "simple-test-project/ProductSummary.sql"
+        },
+        "dataSource": {
+          "name": "SSDT Project",
+          "uri": "simple-test-project/ProductSummary.sql"
+        },
+        "dependencies": [
+          "dbo.Products",
+          "DATEADD",
+          "GETDATE",
+          "dbo"
+        ]
+      }
+    },
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[ProductCategorySummary]",
+      "facets": {
+        "documentation": {
+          "description": "View: [dbo].[ProductCategorySummary]",
+          "filePath": "simple-test-project/ProductCategorySummary.sql"
+        },
+        "dataSource": {
+          "name": "SSDT Project",
+          "uri": "simple-test-project/ProductCategorySummary.sql"
+        },
+        "dependencies": [
+          "dbo.Products",
+          "dbo.Categories",
+          "DATEADD",
+          "GETDATE",
+          "dbo"
+        ]
+      }
+    }
+  ]
+}

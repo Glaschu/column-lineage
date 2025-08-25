@@ -1,0 +1,451 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2025-08-25T20:18:13.139161Z",
+  "run": {
+    "runId": "56ceb785-2563-4f36-b7a1-93238405882c",
+    "facets": {
+      "nominalTime": {
+        "nominalStartTime": "2025-08-25T20:18:13Z"
+      }
+    }
+  },
+  "job": {
+    "namespace": "sqlserver://localhost",
+    "name": "test-schema-project",
+    "facets": {
+      "documentation": {
+        "description": "SSDT Project: test-schema-project"
+      },
+      "sourceCode": {
+        "language": "sql",
+        "source": "SSDT Project Analysis"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[Customers]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "CustomerID",
+              "type": "Int",
+              "description": ""
+            },
+            {
+              "name": "CustomerName",
+              "type": "NVarChar(100)",
+              "description": ""
+            },
+            {
+              "name": "Email",
+              "type": "NVarChar(255)",
+              "description": ""
+            },
+            {
+              "name": "CreateDate",
+              "type": "DateTime2",
+              "description": ""
+            },
+            {
+              "name": "IsActive",
+              "type": "Bit",
+              "description": ""
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "Customers"
+        },
+        "documentation": {
+          "description": "Table: [dbo].[Customers]"
+        }
+      }
+    },
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[Orders]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "OrderID",
+              "type": "Int",
+              "description": ""
+            },
+            {
+              "name": "CustomerID",
+              "type": "Int",
+              "description": ""
+            },
+            {
+              "name": "OrderDate",
+              "type": "DateTime2",
+              "description": ""
+            },
+            {
+              "name": "TotalAmount",
+              "type": "Decimal(18, 2)",
+              "description": ""
+            },
+            {
+              "name": "Status",
+              "type": "NVarChar(50)",
+              "description": ""
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "Orders"
+        },
+        "documentation": {
+          "description": "Table: [dbo].[Orders]"
+        }
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[CustomerOrders]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "CustomerID",
+              "type": "INTEGER",
+              "description": "Output column from CustomerOrders"
+            },
+            {
+              "name": "CustomerName",
+              "type": "VARCHAR(255)",
+              "description": "Output column from CustomerOrders"
+            },
+            {
+              "name": "Email",
+              "type": "VARCHAR(255)",
+              "description": "Output column from CustomerOrders"
+            },
+            {
+              "name": "OrderID",
+              "type": "INTEGER",
+              "description": "Output column from CustomerOrders"
+            },
+            {
+              "name": "OrderDate",
+              "type": "TIMESTAMP",
+              "description": "Output column from CustomerOrders"
+            },
+            {
+              "name": "TotalAmount",
+              "type": "DECIMAL(10,2)",
+              "description": "Output column from CustomerOrders"
+            },
+            {
+              "name": "Status",
+              "type": "VARCHAR(255)",
+              "description": "Output column from CustomerOrders"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "CustomerOrders"
+        },
+        "columnLineage": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-2-0/ColumnLineageDatasetFacet.json",
+          "fields": {
+            "CustomerID": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Customers",
+                  "field": "CustomerID",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "CustomerName": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Customers",
+                  "field": "CustomerName",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "Email": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Customers",
+                  "field": "Email",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "OrderID": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Orders",
+                  "field": "OrderID",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "OrderDate": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Orders",
+                  "field": "OrderDate",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "TotalAmount": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Orders",
+                  "field": "TotalAmount",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            },
+            "Status": {
+              "inputFields": [
+                {
+                  "namespace": "sqlserver://localhost",
+                  "name": "Orders",
+                  "field": "Status",
+                  "transformations": [
+                    {
+                      "type": "DIRECT",
+                      "subtype": "IDENTITY",
+                      "description": "Direct column mapping",
+                      "masking": false
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "dataset": [
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Customers",
+              "field": "CustomerID",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Customers",
+              "field": "CustomerName",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Customers",
+              "field": "Email",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Orders",
+              "field": "OrderID",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Orders",
+              "field": "OrderDate",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Orders",
+              "field": "TotalAmount",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            },
+            {
+              "namespace": "sqlserver://localhost",
+              "name": "Orders",
+              "field": "Status",
+              "transformations": [
+                {
+                  "type": "DIRECT",
+                  "subtype": "IDENTITY",
+                  "description": "Direct column mapping",
+                  "masking": false
+                }
+              ]
+            }
+          ]
+        },
+        "documentation": {
+          "description": "View: [dbo].[CustomerOrders]"
+        }
+      }
+    },
+    {
+      "namespace": "sqlserver://localhost",
+      "name": "[dbo].[GetCustomerOrders]",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+          "fields": [
+            {
+              "name": "CustomerID",
+              "type": "INTEGER",
+              "description": "Output column from GetCustomerOrders"
+            },
+            {
+              "name": "CustomerName",
+              "type": "VARCHAR(255)",
+              "description": "Output column from GetCustomerOrders"
+            },
+            {
+              "name": "Email",
+              "type": "VARCHAR(255)",
+              "description": "Output column from GetCustomerOrders"
+            },
+            {
+              "name": "OrderID",
+              "type": "INTEGER",
+              "description": "Output column from GetCustomerOrders"
+            },
+            {
+              "name": "OrderDate",
+              "type": "TIMESTAMP",
+              "description": "Output column from GetCustomerOrders"
+            },
+            {
+              "name": "TotalAmount",
+              "type": "DECIMAL(10,2)",
+              "description": "Output column from GetCustomerOrders"
+            },
+            {
+              "name": "Status",
+              "type": "VARCHAR(255)",
+              "description": "Output column from GetCustomerOrders"
+            }
+          ]
+        },
+        "dataSource": {
+          "_producer": "https://github.com/agredyaev/column-lineage",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/OpenLineage.json#/definitions/DataSourceDatasetFacet",
+          "name": "sqlserver://localhost",
+          "uri": "GetCustomerOrders"
+        },
+        "documentation": {
+          "description": "StoredProcedure: [dbo].[GetCustomerOrders]"
+        }
+      }
+    }
+  ]
+}

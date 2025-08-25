@@ -1,0 +1,27 @@
+{
+  "eventType": "COMPLETE",
+  "eventTime": "2025-08-25T20:15:59.931527Z",
+  "run": {
+    "runId": "0cbd68bc-c3a7-4525-934c-304bd54f4fdd",
+    "facets": {
+      "nominalTime": {
+        "nominalStartTime": "2025-08-25T20:15:59Z"
+      }
+    }
+  },
+  "job": {
+    "namespace": "sqlserver://localhost",
+    "name": "test-schema-project",
+    "facets": {
+      "documentation": {
+        "description": "SSDT Project: test-schema-project"
+      },
+      "sourceCode": {
+        "language": "sql",
+        "source": "SSDT Project Analysis"
+      }
+    }
+  },
+  "inputs": [],
+  "outputs": []
+}

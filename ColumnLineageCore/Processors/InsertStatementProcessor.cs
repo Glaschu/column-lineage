@@ -22,7 +22,19 @@ namespace ColumnLineageCore.Processors
             if (statement.InsertSpecification.InsertSource is SelectInsertSource selectSource &&
                 selectSource.Select != null)
             {
-                string? targetTableName = (statement.InsertSpecification.Target as NamedTableReference)?.SchemaObject?.BaseIdentifier?.Value;
+                string? targetTableName = null;
+                
+                // Handle different types of table references for INSERT target
+                switch (statement.InsertSpecification.Target)
+                {
+                    case NamedTableReference namedTable:
+                        targetTableName = namedTable.SchemaObject?.BaseIdentifier?.Value;
+                        break;
+                    case VariableTableReference variableTable:
+                        targetTableName = variableTable.Variable?.Name;
+                        break;
+                }
+                
                 if (string.IsNullOrEmpty(targetTableName))
                 {
                     System.Diagnostics.Debug.WriteLine("[Processor] Warning: Could not determine target table name for INSERT statement.");
@@ -35,9 +47,6 @@ namespace ColumnLineageCore.Processors
                 var targetColumns = statement.InsertSpecification.Columns?.Select(c => c.MultiPartIdentifier?.Identifiers?.LastOrDefault()?.Value).Where(name => name != null).ToList();
 
                 // Process the source SELECT query to get its output structure and lineage
-                // We need a way to call the QueryExpression processing logic.
-                // Let's assume LineageAnalyzer provides a helper or we replicate the logic.
-                // For now, let's placeholder this call.
                 List<OutputColumn> sourceOutputColumns = ProcessSourceQuery(selectSource.Select, context);
 
                 if (sourceOutputColumns.Count == 0)
@@ -63,17 +72,33 @@ namespace ColumnLineageCore.Processors
                         string targetColName = targetColumns[i]!;
                         OutputColumn sourceCol = sourceOutputColumns[i];
 
-                        if (sourceCol.SourceNode != null) // Only add edge if the source column has a traceable origin
+                        // Create the target node for the table variable/table
+                        var targetNode = new ColumnNode(targetColName, targetTableName);
+                        context.Graph.AddNode(targetNode);
+
+                        if (sourceCol.SourceNode != null) 
                         {
-                            var targetNode = new ColumnNode(targetColName, targetTableName);
-                            context.Graph.AddNode(targetNode);
+                            // Direct source node available - create direct edge
                             context.Graph.AddNode(sourceCol.SourceNode); // Ensure source node exists
                             context.Graph.AddEdge(sourceCol.SourceNode, targetNode);
                             System.Diagnostics.Debug.WriteLine($"[Processor] Added INSERT lineage edge: {sourceCol.SourceNode.Id} -> {targetNode.Id}");
                         }
                         else
                         {
-                            System.Diagnostics.Debug.WriteLine($"[Processor] Skipping INSERT lineage edge for target '{targetTableName}.{targetColName}' because source '{sourceCol.OutputName}' has no traceable origin.");
+                            // No direct source node (complex expression like CASE) - find the output node that was created by SELECT processing
+                            var outputNode = context.Graph.Nodes
+                                .FirstOrDefault(n => n.SourceName == null && n.Name == sourceCol.OutputName);
+                            
+                            if (outputNode != null)
+                            {
+                                // Found the output node from SELECT processing - connect it to the INSERT target
+                                context.Graph.AddEdge(outputNode, targetNode);
+                                System.Diagnostics.Debug.WriteLine($"[Processor] Added INSERT lineage edge via output node: {outputNode.Id} -> {targetNode.Id}");
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine($"[Processor] Skipping INSERT lineage edge for target '{targetTableName}.{targetColName}' because output node '{sourceCol.OutputName}' not found.");
+                            }
                         }
                     }
                 }
@@ -107,11 +132,8 @@ namespace ColumnLineageCore.Processors
                       var processor = context.ProcessorFactory.GetProcessor(querySpec);
                       if (processor is IQueryExpressionProcessor<QuerySpecification> queryProcessor)
                       {
-                          // IMPORTANT: Need to handle context flags (IsSubquery=true?) correctly if calling ProcessQuery directly
-                          bool originalIsSubquery = context.IsSubquery;
-                          context.IsSubquery = true; // Treat SELECT part of INSERT as a subquery context
+                          // Process the SELECT query normally (not as subquery) to get full lineage
                           var result = queryProcessor.ProcessQuery(querySpec, context);
-                          context.IsSubquery = originalIsSubquery; // Restore flag
                           return result;
                       }
                   }
@@ -120,10 +142,8 @@ namespace ColumnLineageCore.Processors
                       var processor = context.ProcessorFactory.GetProcessor(binaryQuery);
                       if (processor is IQueryExpressionProcessor<BinaryQueryExpression> queryProcessor)
                       {
-                          bool originalIsSubquery = context.IsSubquery;
-                          context.IsSubquery = true;
+                          // Process the binary query normally (not as subquery) to get full lineage
                           var result = queryProcessor.ProcessQuery(binaryQuery, context);
-                          context.IsSubquery = originalIsSubquery;
                           return result;
                       }
                   }

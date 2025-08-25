@@ -1,0 +1,102 @@
+{
+  "exportedAt": "2025-08-25T19:53:30Z",
+  "version": "1.0",
+  "objects": [
+    {
+      "name": "Products",
+      "schema": "dbo",
+      "fullName": "[dbo].[Products]",
+      "type": "table",
+      "filePath": "simple-test-project/Products.sql",
+      "columns": [
+        {
+          "name": "ProductID",
+          "dataType": "Int",
+          "description": ""
+        },
+        {
+          "name": "ProductName",
+          "dataType": "NVarChar(100)",
+          "description": ""
+        },
+        {
+          "name": "CategoryID",
+          "dataType": "Int",
+          "description": ""
+        },
+        {
+          "name": "Price",
+          "dataType": "Decimal(18, 2)",
+          "description": ""
+        },
+        {
+          "name": "CreateDate",
+          "dataType": "DateTime2",
+          "description": ""
+        }
+      ],
+      "dependencies": [
+        "GETDATE",
+        "dbo",
+        "dbo.Products"
+      ],
+      "metadata": {
+        "filePath": "simple-test-project/Products.sql",
+        "fileSize": 240,
+        "lastModified": "2025-08-25T20:53:13.4842151+01:00"
+      },
+      "datasetNamespace": "sqlserver://localhost"
+    },
+    {
+      "name": "ProductSummary",
+      "schema": "dbo",
+      "fullName": "[dbo].[ProductSummary]",
+      "type": "view",
+      "filePath": "simple-test-project/ProductSummary.sql",
+      "columns": [
+        {
+          "name": "ProductID",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "ProductName",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "Price",
+          "dataType": "unknown",
+          "description": ""
+        },
+        {
+          "name": "PriceCategory",
+          "dataType": "unknown",
+          "description": ""
+        }
+      ],
+      "dependencies": [
+        "dbo.Products",
+        "DATEADD",
+        "GETDATE",
+        "dbo"
+      ],
+      "metadata": {
+        "filePath": "simple-test-project/ProductSummary.sql",
+        "fileSize": 299,
+        "lastModified": "2025-08-25T20:53:21.4993419+01:00"
+      },
+      "datasetNamespace": "sqlserver://localhost"
+    }
+  ],
+  "summary": {
+    "totalObjects": 2,
+    "tables": 1,
+    "views": 1,
+    "storedProcedures": 0,
+    "functions": 0,
+    "schemasIncluded": [
+      "dbo"
+    ]
+  }
+}

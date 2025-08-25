@@ -65,7 +65,22 @@ namespace ColumnLineageCore.Processors
                      var processor = context.ProcessorFactory.GetProcessor(nestedJoinRef);
                      processor.Process(nestedJoinRef, context);
                 }
-                // Add other TableReference types here (VariableTableReference, etc.)
+                else if (tableReference is PivotedTableReference pivotRef)
+                {
+                     var processor = context.ProcessorFactory.GetProcessor(pivotRef);
+                     processor.Process(pivotRef, context);
+                }
+                else if (tableReference is UnpivotedTableReference unpivotRef)
+                {
+                     var processor = context.ProcessorFactory.GetProcessor(unpivotRef);
+                     processor.Process(unpivotRef, context);
+                }
+                else if (tableReference is VariableTableReference varRef)
+                {
+                     var processor = context.ProcessorFactory.GetProcessor(varRef);
+                     processor.Process(varRef, context);
+                }
+                // Add other TableReference types here
                 else
                 {
                      System.Diagnostics.Debug.WriteLine($"[Processor] Warning: Unsupported child table reference type in JOIN: {tableReference.GetType().Name}");
